@@ -3,6 +3,13 @@ import axios from "axios";
 
 export default class PlantList extends Component {
   // add state with a property called "plants" - initialize as an empty array
+  constructor(){
+    super();
+    this.state ={
+      formValue: "",
+      plants: []
+    }
+  }
 
   // when the component mounts:
   //   - fetch data from the server endpoint - http://localhost:3333/plants
@@ -16,29 +23,44 @@ export default class PlantList extends Component {
       })
       .catch(err => {console.log(err);})
   }
-  componentDidUpdate(){
-
+  componentDidUpdate(prevProp, prevState){
+    if (prevState.formValue !== this.state.formValue) {
+      this.state.formValue.toUpperCase()
+      let regS = new RegExp(this.state.formValue, 'i')
+      console.log(regS);
+  
+      axios
+      .get("http://localhost:3333/plants")
+      .then(res => {
+        if(regS !== "") {
+          let searhcResults = res.data.plantsData.filter(currentPlant => {
+            console.log(regS.test(currentPlant.name));
+            return (regS.test(currentPlant.name)) 
+          })
+          this.setState({plants: searhcResults })
+        } else {
+          this.setState({plants: res.data.plantsData })
+        }
+      })
+      .catch(err => {console.log(err);})
+    }
   }
-  // searchFilteredPlants = (searchedPlant) => {
-  //   axios
-  //   .get("http://localhost:3333/plants")
-  //   .then(res => {
-  //     res.data.plantsData.filter(currentPlant => {
-  //       if (searchedPlant == currentPlant.name) {
-  //         return 
-  //       }
-  //     })
-  //     this.setState({plants:  })
-  //   })
-  //   .catch(err => {console.log(err);})
-  // }
+  handleChanges = (eve) => {
+    let search = eve.target.value
+    this.setState({ ...this.state.formValue, formValue: search });
+  };
+
+
   /*********  DON'T CHANGE ANYTHING IN THE RENDER FUNCTION *********/
   render() {
     return (
       <main className="plant-list">
-        <div className="searchbar">
-          <input type="text" placeholder="Search"/><button>Search</button>
-        </div>
+        <input 
+          type="text" 
+          placeholder="Search" 
+          value={this.state.formValue}
+          onChange={this.handleChanges} 
+        />
         {this.state?.plants?.map((plant) => (
           <div className="plant-card" key={plant.id}>
             <img className="plant-image" src={plant.img} alt={plant.name} />
