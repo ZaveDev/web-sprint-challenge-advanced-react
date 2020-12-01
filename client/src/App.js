@@ -11,6 +11,9 @@ function App() {
   // array of plants that have been added to the cart
   const [cart, setCart] = useState([]);
 
+  const searchFilteredPlants = () => {
+    
+  }
   // add a plant to the cart
   const addToCart = (plant) => {
     setCart([...cart, plant]);
@@ -20,6 +23,8 @@ function App() {
   const removeFromCart = (plant) => {
     setCart(cart.filter((p) => p.id !== plant.id));
   };
+
+
 
   return (
     <div>
